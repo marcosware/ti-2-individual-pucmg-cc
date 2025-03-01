@@ -25,6 +25,22 @@ public class UsuarioDAO extends DAO {
 		return status;
 	}
 	
+	public boolean updateUsuario(Usuario usuario) {
+		boolean status = false;
+		try {
+			Statement st = conn.createStatement();
+			String sql = "UPDATE usuario SET login = '" + usuario.getLogin() + "', senha = '"
+					+ usuario.getSenha() + "`, sexo = '" + usuario.getSexo() + "'"
+					+ " WHERE codigo = " + usuario.getCodigo();
+			st.executeUpdate(sql);
+			st.close();
+			status = true;
+		} catch (SQLException u) {
+			throw new RuntimeException(u);
+		}
+		return status;
+	}
+	
 	public boolean deleteUsuario(int codigo) {
 		boolean status = false;
 		try {
@@ -81,5 +97,22 @@ public class UsuarioDAO extends DAO {
 			System.err.println(e.getMessage());
 		}
 		return usuarios;
+	}
+	
+	public Usuario getUsuariosById(int codigo) {
+		Usuario usuario;
+		
+		try {
+			Statement st = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = st.executeQuery("SELECT * FROM usuario WHERE codigo = " + codigo);
+			if(rs.next()) {
+				usuario = new Usuario(rs.getInt("codigo"), rs.getString("login"),
+											  rs.getString("senha"), rs.getString("sexo").charAt(0));
+				}
+			}
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+		return usuario;
 	}
 }
