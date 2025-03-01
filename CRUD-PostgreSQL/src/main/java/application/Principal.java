@@ -5,10 +5,10 @@ import dao.*;
 import model.*;
 
 public class Principal {
+	public static Scanner sc = new Scanner(System.in);
 	
 	public static int menu() {
 		int option = -1;
-		Scanner sc = new Scanner(System.in);
 		do {
 			System.out.println("GERENCIADOR DE USUARIOS");
 			System.out.println("1 - Inserir");
@@ -16,17 +16,17 @@ public class Principal {
 			System.out.println("3 - Atualizar");
 			System.out.println("4 - Deletar");
 			System.out.println("0 - Sair");
+			System.out.print("OPÇÃO: ");
 			option = sc.nextInt();
 		} while(option < 0 || option > 4);
-		sc.close();
 		return option;
 	}
 	
 	public static void inserir(UsuarioDAO userDao) {
-		Scanner sc = new Scanner(System.in);
 		System.out.print("Codigo: ");
 		int codigo = sc.nextInt();
 		System.out.print("Login: ");
+		sc.nextLine();
 		String login = sc.nextLine();
 		System.out.print("Senha: ");
 		String senha = sc.nextLine();
@@ -36,7 +36,6 @@ public class Principal {
 		if(userDao.insertUsuario(usuario)) {
 			System.out.println("Novo usuario inserido com sucesso! " + usuario.toString());
 		} 
-		sc.close();
 	}
 	
 	public static void listar(UsuarioDAO userDao) {
@@ -47,42 +46,64 @@ public class Principal {
 	}
 	
 	public static void atualizar(UsuarioDAO userDao) {
-		int option;
-		Scanner sc = new Scanner(System.in);		
-		System.out.println("Digite o codigo do usuario a ser atualizado: ");
-		Usuario usuario = userDao.getUsuariosById(sc.nextInt());
+		int option;		
+		System.out.print("Digite o codigo do usuario a ser atualizado: ");
+		Usuario usuario = userDao.getUsuarioById(sc.nextInt());
 		System.out.println("O que deseja atualizar?");
 		do {
-			System.out.println("1 - Login\n2 - Senha\n3 - Sexo\nOPCAO: ");
+			System.out.print("1 - Login\n2 - Senha\n3 - Sexo\nOPÇÃO: ");
 			option = sc.nextInt();
+			sc.nextLine();
 		} while(option < 1 || option > 3);
-		/*switch(option) {
+		switch(option) {
 			case 1:
-				System
-		}*/
+				System.out.print("Digite o novo login: ");
+				usuario.setLogin(sc.nextLine());
+				break;
+			case 2:
+				System.out.print("Digite a nova senha: ");
+				usuario.setSenha(sc.nextLine());
+				break;
+			case 3:
+				System.out.print("Digite o novo sexo: " );
+				usuario.setSexo(sc.nextLine().charAt(0));
+				break;
+		}
+		userDao.updateUsuario(usuario);
+	}
+	
+	public static void deletar(UsuarioDAO userDao) {
+		System.out.print("Digite o codigo do usuario a ser deletado: ");
+		Usuario usuario = userDao.getUsuarioById(sc.nextInt());
+		userDao.deleteUsuario(usuario.getCodigo());
 	}
 	
 	
 	public static void main(String args[]) {
-		
 		DAO dao = new DAO();
 		UsuarioDAO userDao = new UsuarioDAO();
 		dao.conectar();
-		int option = menu();
-		switch(option) {
-			case 1:
-				inserir(userDao);
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
-			case 0:
-				break;
-			default:
-				break;
-		}
+		int option = -1;
+		do {
+			option = menu();
+			switch(option) {
+				case 1:
+					inserir(userDao);
+					break;
+				case 2:
+					listar(userDao);
+					break;
+				case 3:
+					atualizar(userDao);
+					break;
+				case 4:
+					deletar(userDao);
+					break;
+				case 0:
+					System.out.println("\nEncerrando...");
+					break;
+			}
+		} while(option != 0);
+		sc.close();
 	}
 }
